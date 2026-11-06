@@ -11,13 +11,6 @@ const ClusterPage = () => {
   const nodes = useMemo(() => {
     if (!data) return [];
 
-    if (Array.isArray(data.knownNodes)) {
-      return data.knownNodes.map((node) => ({
-        ...node,
-        role: data.layout?.roles.find((role) => role.id === node.id),
-      }));
-    }
-
     return data.nodes || [];
   }, [data]);
 
@@ -35,7 +28,7 @@ const ClusterPage = () => {
           <DetailItem title="DB engine" value={node?.dbEngine} />
           <DetailItem
             title="Layout version"
-            value={data?.layoutVersion || data?.layout?.version || "-"}
+            value={data?.layoutVersion || "-"}
           />
         </Card.Body>
       </Card>

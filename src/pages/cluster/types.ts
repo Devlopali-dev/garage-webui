@@ -2,41 +2,46 @@
 
 export type GetNodeInfoResult = {
   success: {
-    [key: string]: {
-      nodeId:         string;
-      garageVersion:  string;
-      garageFeatures: string[];
-      rustVersion:    string;
-      dbEngine:       string;
-    };
+    [key: string]: NodeInfo;
   };
-  error:   Error;
-}
+  error: Error;
+};
 
-
-export type GetStatusResult = {
-  node: string;
+export type NodeInfo = {
+  nodeId: string;
   garageVersion: string;
-  garageFeatures: string[];
+  garageFeatures: string[] | null;
   rustVersion: string;
   dbEngine: string;
-  layoutVersion: number;
-  nodes?: Node[];
-  knownNodes?: Node[];
-  layout?: GetClusterLayoutResult;
+  hostname?: string | null;
+  addr?: string | null;
+  isUp?: boolean | null;
+  role?: Role | null;
+  draining?: boolean | null;
+  dataPartition?: DataPartition | null;
+  metadataPartition?: DataPartition | null;
 };
 
-export type Node = {
-  id: string;
-  role?: Role | StagedRole;
-  addr: string;
-  hostname: string;
-  isUp: boolean;
-  lastSeenSecsAgo: number | null;
-  draining?: boolean;
-  dataPartition?: DataPartition;
-  metadataPartition?: DataPartition;
+export type GetStatusResult = {
+  layoutVersion: number;
+  nodes: NodeResp[];
 };
+
+export type NodeResp = {
+  id: string;
+  role?: Role | StagedRole | null;
+  addr?: string | null;
+  hostname?: string | null;
+  garageVersion?: string | null;
+  isUp: boolean;
+  lastSeenSecsAgo?: number | null;
+  draining: boolean;
+  dataPartition?: DataPartition | null;
+  metadataPartition?: DataPartition | null;
+  resyncQueueLen?: number | null;
+};
+
+export type Node = NodeResp;
 
 export type DataPartition = {
   available: number;
@@ -44,9 +49,9 @@ export type DataPartition = {
 };
 
 export type Role = {
-  id: string;
+  id?: string;
   zone: string;
-  capacity: number;
+  capacity: number | null;
   tags: string[];
 };
 
@@ -57,7 +62,14 @@ export type StagedRole = { id: string; remove: boolean } & Partial<
 export type GetClusterLayoutResult = {
   version: number;
   roles: Role[];
+  parameters: LayoutParameters;
+  partitionSize: number;
+  stagedParameters?: LayoutParameters | null;
   stagedRoleChanges: StagedRole[];
+};
+
+export type LayoutParameters = {
+  zoneRedundancy: number;
 };
 
 export type AssignNodeBody = {
